@@ -1,0 +1,28 @@
+{
+  "name": "xmlhttprequest-polyfill",
+  "version": "0.1.0",
+  "description": "XMLHttpRequest polyfill using Fetch API",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "bun test",
+    "prepublishOnly": "bun build ./src/index.ts --outfile=build/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/endel/xmlhttprequest-polyfill.git"
+  },
+  "keywords": [
+    "xmlhttprequest",
+    "polyfill",
+    "fetch"
+  ],
+  "author": "Endel Dreyer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/endel/xmlhttprequest-polyfill/issues"
+  },
+  "homepage": "https://github.com/endel/xmlhttprequest-polyfill#readme",
+  "devDependencies": {
+    "@types/mocha": "^10.0.1"
+  }
+}
