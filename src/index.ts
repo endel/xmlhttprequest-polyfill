@@ -18,6 +18,8 @@ if (!globalThis['XMLHttpRequest']) {
     public status: number;
     public response: any;
 
+    private allHeaders: string;
+
     constructor() {}
 
     set ontimeout(cb: Callback) { this._events['timeout'] = cb; }
@@ -44,7 +46,7 @@ if (!globalThis['XMLHttpRequest']) {
     }
 
     getAllResponseHeaders() {
-      return this.headers;
+      return this.allHeaders;
     }
 
     open(method: string, url: string) {
@@ -63,23 +65,32 @@ if (!globalThis['XMLHttpRequest']) {
         options.credentials = "include";
       }
 
-      // err.timeout = err.type == 'timeout';
-
       // dummy ProgressEvent
       const e = new ProgressEvent();
       this._events['loadstart']?.(e);
 
-      fetch(this._url, options).then((response) => {
+      fetch(this._url, options).then(async (response) => {
         // fill response headers
+        this.allHeaders = "";
         this.headers = {};
-        response.headers.forEach((value, key) =>
-          this.headers[key] = value);
+        response.headers.forEach((value, key) => {
+          this.headers[key] = value;
+          this.allHeaders += key + ": " + value + "\r\n";
+        });
+
+        this.status = response.status;
+        this.statusText = response.statusText;
+        this.response = await response.text();
 
         // trigger events
         this._events['onload']?.(e);
         this._events['loadend']?.(e);
 
       }).catch((reason) => {
+        if (reason.code && (reason.code == 20 || reason.code == 23)) {
+          reason.type = 'timeout';
+        }
+
         this._events['onerror']?.(reason);
       });
     }
