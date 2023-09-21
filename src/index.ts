@@ -55,13 +55,13 @@ if (!globalThis['XMLHttpRequest']) {
     }
 
     send(body?: string) {
-      const controller = new AbortController();
+      // const controller = new AbortController();
 
       const options: RequestInit = {
         method: this._method,
         headers: this._headers,
         body,
-        signal: controller.signal,
+        // signal: controller.signal,
       };
 
       if (this.withCredentials) {
@@ -72,13 +72,13 @@ if (!globalThis['XMLHttpRequest']) {
       const e = new ProgressEvent();
       this._events['loadstart']?.(e);
 
-      let timeoutId: number;
-      if (this.timeout > 0) {
-        timeoutId = setTimeout(() => controller.abort(), this.timeout);
-      }
+      // let timeoutId: number;
+      // if (this.timeout > 0) {
+      //   timeoutId = setTimeout(() => controller.abort(), this.timeout);
+      // }
 
       fetch(this._url, options).then(async (response) => {
-        clearTimeout(timeoutId);
+        // clearTimeout(timeoutId);
 
         // fill response headers
         this.allHeaders = "";
@@ -97,7 +97,7 @@ if (!globalThis['XMLHttpRequest']) {
         this._events['loadend']?.(e);
 
       }).catch((reason) => {
-        clearTimeout(timeoutId);
+        // clearTimeout(timeoutId);
         console.error(reason.message);
 
         if (reason.code && (reason.code == 20 || reason.code == 23)) {
