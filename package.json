@@ -1,6 +1,6 @@
 {
   "name": "xmlhttprequest-polyfill",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "XMLHttpRequest polyfill using Fetch API",
   "main": "build/index.js",
   "scripts": {

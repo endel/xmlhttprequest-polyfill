@@ -4,9 +4,10 @@ if (!globalThis['XMLHttpRequest']) {
   class ProgressEvent {}
 
   class XMLHttpRequest {
-    public withCredentials: boolean = undefined;
+    public withCredentials?: boolean = undefined;
 
     // request info
+    public timeout: number = 0;
     private _events: {[name: string]: Callback} = {};
     private _headers: {[name: string]: string} = {};
     private _method: string;
@@ -17,7 +18,6 @@ if (!globalThis['XMLHttpRequest']) {
     public statusText: string;
     public status: number;
     public response: any;
-
     private allHeaders: string;
 
     constructor() {}
@@ -55,10 +55,13 @@ if (!globalThis['XMLHttpRequest']) {
     }
 
     send(body?: string) {
+      const controller = new AbortController();
+
       const options: RequestInit = {
         method: this._method,
         headers: this._headers,
         body,
+        signal: controller.signal,
       };
 
       if (this.withCredentials) {
@@ -69,7 +72,14 @@ if (!globalThis['XMLHttpRequest']) {
       const e = new ProgressEvent();
       this._events['loadstart']?.(e);
 
+      let timeoutId: number;
+      if (this.timeout > 0) {
+        timeoutId = setTimeout(() => controller.abort(), this.timeout);
+      }
+
       fetch(this._url, options).then(async (response) => {
+        clearTimeout(timeoutId);
+
         // fill response headers
         this.allHeaders = "";
         this.headers = {};
@@ -87,6 +97,7 @@ if (!globalThis['XMLHttpRequest']) {
         this._events['loadend']?.(e);
 
       }).catch((reason) => {
+        clearTimeout(timeoutId);
         console.error(reason.message);
 
         if (reason.code && (reason.code == 20 || reason.code == 23)) {
