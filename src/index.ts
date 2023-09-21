@@ -73,25 +73,27 @@ if (!globalThis['XMLHttpRequest']) {
         // fill response headers
         this.allHeaders = "";
         this.headers = {};
-        response.headers.forEach((value, key) => {
+        for (const [key, value] of response.headers.entries()) {
           this.headers[key] = value;
           this.allHeaders += key + ": " + value + "\r\n";
-        });
+        }
 
         this.status = response.status;
         this.statusText = response.statusText;
         this.response = await response.text();
 
         // trigger events
-        this._events['onload']?.(e);
+        this._events['load']?.(e);
         this._events['loadend']?.(e);
 
       }).catch((reason) => {
+        console.error(reason.message);
+
         if (reason.code && (reason.code == 20 || reason.code == 23)) {
           reason.type = 'timeout';
         }
 
-        this._events['onerror']?.(reason);
+        this._events['error']?.(reason);
       });
     }
 
